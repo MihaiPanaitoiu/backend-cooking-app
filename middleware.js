@@ -6,7 +6,8 @@ const Review = require('./models/review');
 module.exports.isLoggedIn = (req, res, next) => {
     if (!req.isAuthenticated()) {
         req.session.returnTo = req.originalUrl
-        return res.redirect('/login');
+        res.status(401);
+        return res.send('Unauthorized request');
     }
     console.log('isAuthenticated', req.isAuthenticated());
     next();
@@ -27,6 +28,7 @@ module.exports.isAuthor = async (req, res, next) => {
     const { id } = req.params;
     const recipe = await Recipe.findById(id);
     if (!recipe.author.equals(req.user._id)) {
+        res.status(401);
         return res.send({ error: 'You do not have permission to do that!' });
     }
     next();
